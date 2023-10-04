@@ -57,7 +57,7 @@ resource "aws_instance" "instances_m4" {
   key_name               = var.key_pair_name_m4
   vpc_security_group_ids = [aws_security_group.security_gp.id]
   availability_zone      = "us-east-1c"
-  #   user_data              = file("userdata.sh")
+  user_data              = file("./user_data.sh")
   count = 4
   tags = {
     Name = "M4"
@@ -70,7 +70,7 @@ resource "aws_instance" "instances_t2" {
   key_name               = var.key_pair_name_t2
   vpc_security_group_ids = [aws_security_group.security_gp.id]
   availability_zone      = "us-east-1d"
-  #   user_data              = file("userdata.sh")
+  user_data              = file("./user_data.sh")
   count = 5
   tags = {
     Name = "T2"
