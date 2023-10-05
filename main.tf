@@ -16,7 +16,7 @@ provider "aws" {
   token      = var.aws_session_token
 }
 
-resource "aws_security_group" "security_gp" {
+resource "aws_security_group" "security_group" {
   vpc_id = data.aws_vpc.default.id
 
   ingress {
@@ -51,27 +51,27 @@ resource "aws_key_pair" "key_pair_name_t2" {
 }
 
 
-resource "aws_instance" "instances_m4" {
+resource "aws_instance" "ec2_instances_m4" {
   ami                    = "ami-03a6eaae9938c858c"
   instance_type          = "m4.large"
   key_name               = var.key_pair_name_m4
   vpc_security_group_ids = [aws_security_group.security_gp.id]
   availability_zone      = "us-east-1c"
   user_data              = file("./user_data.sh")
-  count = 4
+  count = 1
   tags = {
     Name = "M4"
   }
 }
 
-resource "aws_instance" "instances_t2" {
+resource "aws_instance" "ec2_instances_t2" {
   ami                    = "ami-03a6eaae9938c858c"
   instance_type          = "t2.large"
   key_name               = var.key_pair_name_t2
   vpc_security_group_ids = [aws_security_group.security_gp.id]
   availability_zone      = "us-east-1d"
   user_data              = file("./user_data.sh")
-  count = 5
+  count = 1
   tags = {
     Name = "T2"
   }
@@ -115,7 +115,7 @@ resource "aws_alb_listener" "listener" {
   }
 }
 
-resource "aws_alb_listener_rule" "M4_rule" {
+resource "aws_alb_listener_rule" "rule_M4" {
   listener_arn = aws_alb_listener.listener.arn
 
   action {
@@ -130,7 +130,7 @@ resource "aws_alb_listener_rule" "M4_rule" {
   }
 }
 
-resource "aws_alb_listener_rule" "T2_rule" {
+resource "aws_alb_listener_rule" "rule_T2" {
   listener_arn = aws_alb_listener.listener.arn
 
   action {
@@ -145,14 +145,14 @@ resource "aws_alb_listener_rule" "T2_rule" {
   }
 }
 
-resource "aws_alb_target_group_attachment" "M4_attachments" {
+resource "aws_alb_target_group_attachment" "attachments_M4" {
   count            = length(aws_instance.instances_m4)
   target_group_arn = aws_alb_target_group.M4.arn
   target_id        = aws_instance.instances_m4[count.index].id
   port             = 80
 }
 
-resource "aws_alb_target_group_attachment" "T2_attachments" {
+resource "aws_alb_target_group_attachment" "attachments_T2" {
   count            = length(aws_instance.instances_t2)
   target_group_arn = aws_alb_target_group.T2.arn
   target_id        = aws_instance.instances_t2[count.index].id
