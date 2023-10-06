@@ -112,9 +112,6 @@ def plot_elb_table (cloud_watch_client) :
     plt.savefig('metrics/elb-plots.png', bbox_inches='tight')
 
 if __name__ == "__main__":
-    AWS_ACCESS_KEY_ID = 'ASIA4LCUTONQXRSZN62D'
-    AWS_SECRET_ACCESS_KEY = 'm5o1vRIESZGuHMsgPzXM3RDjMCgXmkx4ZgLpWVK0'
-    AWS_SESSION_TOKEN = 'FwoGZXIvYXdzEHEaDPoLFEzUHSFmswzZ+SLKAbv973UVm77pSQLaiNXFkV4SEuatN4x2SkpltyVeNKT66Ut3P7xhPAMAFSECD/0c/v4pufxeKLF+txLfEXjj1Hj+lA55QH9KYkRuSg4wcVEaVWUoEi3e75eVliLcMs6ZQ45k9aIip3OxEmWIAdEna5NwNzZ0lPOC3WGgFDL6rsGZ47y2M1lxwy1kG8WnXV78keOUf14KSiG6YUB84BTkUlXQJGMsWV/IBe/tm1ATetAk1qmx9e7KTY70GJVfLdAOfOJSPd3L9XGM6cEo7Iz9qAYyLUEizfygzSiS+3CyLxGheUgyXM1Gkp6VJFUk4aLAMWPyZsbLoKiK5bPmKUtOWw=='
     
     region = 'us-east-1'
     lb_client = boto3.client('elbv2', region_name=region, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY,aws_session_token=AWS_SESSION_TOKEN)
