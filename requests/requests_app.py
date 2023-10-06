@@ -28,7 +28,11 @@ if __name__ == "__main__":
   print("Waiting 30 seconds for the instances to be initialized...\n")
   sleep(30)
   
+<<<<<<< HEAD
   load_balancer_url = "http://" + os.environ.get('load_balancer_url')
+=======
+  load_balancer_url = "http://load-balancer-737662605.us-east-1.elb.amazonaws.com"
+>>>>>>> f56f3cc... Refactor benchmark main file
   headers = {"content-type": "application/json"}
   
   cluster_1 = Thread(target=request_cluster_1, args=(load_balancer_url + "/cluster1", headers))
