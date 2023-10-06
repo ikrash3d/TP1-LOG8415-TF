@@ -49,11 +49,11 @@ if __name__ == "__main__":
   
   # sleep(60)
   
-  load_balancer_url = "http://load-balancer-1873499195.us-east-1.elb.amazonaws.com"
+  load_balancer_url = "http://load-balancer-737662605.us-east-1.elb.amazonaws.com"
   headers = {"content-type": "application/json"}
   
   cluster_1 = Thread(target=request_cluster_1, args=(load_balancer_url + "/cluster1", headers))
-  cluster_2 = Thread(target=request_cluster_2, args=(load_balancer_url + "/cluster1", headers))
+  cluster_2 = Thread(target=request_cluster_2, args=(load_balancer_url + "/cluster2", headers))
   
   cluster_1.start()
   print("Cluster 1 started\n")
