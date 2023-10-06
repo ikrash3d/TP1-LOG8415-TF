@@ -58,7 +58,7 @@ resource "aws_instance" "instances_m4" {
   vpc_security_group_ids = [aws_security_group.security_gp.id]
   availability_zone      = "us-east-1c"
   user_data              = file("./user_data.sh")
-  count = 1
+  count = 5
   tags = {
     Name = "M4"
   }
@@ -71,7 +71,7 @@ resource "aws_instance" "instances_t2" {
   vpc_security_group_ids = [aws_security_group.security_gp.id]
   availability_zone      = "us-east-1d"
   user_data              = file("./user_data.sh")
-  count = 1
+  count = 4
   tags = {
     Name = "T2"
   }
@@ -158,3 +158,4 @@ resource "aws_alb_target_group_attachment" "T2_attachments" {
   target_id        = aws_instance.instances_t2[count.index].id
   port             = 80
 }
+
