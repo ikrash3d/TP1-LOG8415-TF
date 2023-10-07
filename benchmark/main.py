@@ -1,10 +1,11 @@
+import os
 import boto3
 import matplotlib.pyplot as plt
 from datetime import timedelta, datetime
 
-AWS_ACCESS_KEY = "ASIA4LCUTONQYPI7UF6C"
-AWS_SECRET_KEY = "m72nVzWQgrQWkT8Ubr9sqOIf5awl7KBIWPiiz2ao"
-AWS_SESSION_TOKEN = "FwoGZXIvYXdzEIT//////////wEaDOJc6DODptvtomTycCLKAfErgzxJUIA9bOPd5jsoTpBv0VTArjHqESkP/SxcDSfG9DZPeE5LPx8+tkW5q4AZHS7p6qfakLnhExAdo3dX1A9wUw4K7GH5/WR7m8NHU6GFYYTqKbTRrEJRN75061cNjRMZreBVdiW5b3N3vaHa5PpB74I3WQ4yPBB6VK4/Hkflixb8oGcgRo9mS1MgvIje7acKytVMqoltNEb12xVOI6xi3i9auECzNvO2CX60t/5m5A7QwIx2zWuzd7v+MkKwixyc2fxYyJ3lTyso3rCBqQYyLX6Sn+INeihIyiYWS2F65eB3/fLoEA7nhLEexGPQrPA5vsYuRJLtjNxz/M29Gg=="
+AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY')
+AWS_SECRET_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_SESSION_TOKEN = os.environ.get('AWS_SESSION_TOKEN')
 
 def initialize_clients():
     lb_client = boto3.client('elbv2', region_name="us-east-1", aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY, aws_session_token=AWS_SESSION_TOKEN)
