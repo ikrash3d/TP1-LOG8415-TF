@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ## Getting AWS credentials from the terminal
 export AWS_ACCESS_KEY="$1"
 export AWS_SECRET_ACCESS_KEY="$2"
