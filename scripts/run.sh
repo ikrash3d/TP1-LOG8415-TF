@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ## Getting AWS credentials from the terminal
-# export aws_access_key_id="$1"
-# export aws_secret_access_key="$2"
-# export aws_session_token="$3"
+export AWS_ACCESS_KEY="$1"
+export AWS_SECRET_ACCESS_KEY="$2"
+export AWS_SESSION_TOKEN="$3"
 
 echo -e "Starting Assignment 1...\n"
 echo -e "-----------\n"
@@ -23,12 +23,15 @@ echo -e "\nSending requests...\n"
 docker logs -f requests_app_latest
 
 # Removing the docker container
-echo e "Removing the docker container\n"
+echo -e "Removing the docker container...\n"
 docker rm requests_app_latest
 
-## TODO : Run the benchmark
+# Run benchmark
+echo -e "Running benchmarks...\n"
+./run_benchmark.sh
 
 ## Killing the infrastructure
-#./kill_instances.sh
+echo -e "Terminating infrastructure...\n"
+./kill_instances.sh
 
 echo -e "You successfully ended Assignment 1 :)"

@@ -3,9 +3,7 @@ set -e # if ant commands fail, the script stops
 
 echo -e "Creating instances...\n"
 
-cd ..
-
-cd ./infrastructure
+cd ../infrastructure
 
 terraform.exe init
 
@@ -19,3 +17,6 @@ export load_balancer_url="$load_balancer_url"
 
 echo -e "Everything was created successfully\n"
 echo -e "-----------\n"
+
+# Returning to root folder
+cd ..
