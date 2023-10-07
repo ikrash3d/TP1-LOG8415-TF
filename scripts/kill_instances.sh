@@ -3,9 +3,7 @@ set -e # if any commands fail, the script stops
 
 echo -e "Destroying all instances...\n"
 
-cd ..
-
-cd ./infrastructure
+cd ../infrastructure
 
 terraform.exe destroy -auto-approve
 
