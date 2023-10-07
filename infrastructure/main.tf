@@ -159,3 +159,7 @@ resource "aws_alb_target_group_attachment" "T2_attachments" {
   port             = 80
 }
 
+output "load_balancer_url"{
+  description = "The infrastructure load balancer url"
+  value = aws_alb.load_balancer.*.dns_name[0]
+}
