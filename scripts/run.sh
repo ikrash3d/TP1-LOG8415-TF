@@ -12,7 +12,7 @@ echo "Please provide your AWS Secret Access Key: "
 read AWS_SECRET_ACCESS_KEY
 echo
 
-echo "Please provide your AWS Session Token Key: "
+echo "Please provide your AWS Session Token: "
 read AWS_SESSION_TOKEN
 echo
 
