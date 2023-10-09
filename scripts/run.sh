@@ -25,28 +25,17 @@ echo -e "Starting Assignment 1...\n"
 echo -e "-----------\n"
 
 ## Deploying the infrastructure
+echo -e "Deploying the infrastructure...\n"
 ./create_instances.sh
 
 ## Sending the requests to the load balancer
-docker pull ikrash3d/requests_app:latest
+./send_requests.sh
 
-echo $load_balancer_url
-
-docker run -e load_balancer_url="$load_balancer_url" -d --name requests_app_latest ikrash3d/requests_app:latest
-echo -e "\nSending requests...\n"
-
-## Shows the prints of the requests_app
-docker logs -f requests_app_latest
-
-# Removing the docker container
-echo -e "Removing the docker container...\n"
-docker rm requests_app_latest
-
-# Run benchmark
-echo -e "Running benchmarks...\n"
+# Running the benchmark
+echo -e "Running the benchmarks...\n"
 ./run_benchmark.sh
 
-# Killing the infrastructure
+# Terminating the infrastructure
 echo -e "Terminating infrastructure...\n"
 ./kill_instances.sh
 

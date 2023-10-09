@@ -16,8 +16,6 @@ terraform.exe apply -auto-approve -var="aws_access_key_id=$AWS_ACCESS_KEY" -var=
 # Retrieve the load balancer URL
 load_balancer_url=$(terraform.exe output --raw load_balancer_url)
 
-echo -e "load_balancer_url extracted: " $load_balancer_url
-
 # Export the load_balancer_url variable
 echo "export load_balancer_url=$load_balancer_url" >> ../scripts/env_vars.sh
 
