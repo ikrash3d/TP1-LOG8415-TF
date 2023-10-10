@@ -16,7 +16,7 @@ provider "aws" {
   token      = var.aws_session_token
 }
 
-resource "aws_security_group" "security_gp" {
+resource "aws_security_group" "security_group" {
   vpc_id = data.aws_vpc.default.id
 
   ingress {
@@ -55,10 +55,10 @@ resource "aws_instance" "instances_m4" {
   ami                    = "ami-03a6eaae9938c858c"
   instance_type          = "m4.large"
   key_name               = var.key_pair_name_m4
-  vpc_security_group_ids = [aws_security_group.security_gp.id]
+  vpc_security_group_ids = [aws_security_group.security_group.id]
   availability_zone      = "us-east-1c"
   user_data              = file("./user_data.sh")
-  count = 5
+  count                  = 5
   tags = {
     Name = "M4"
   }
@@ -68,10 +68,10 @@ resource "aws_instance" "instances_t2" {
   ami                    = "ami-03a6eaae9938c858c"
   instance_type          = "t2.large"
   key_name               = var.key_pair_name_t2
-  vpc_security_group_ids = [aws_security_group.security_gp.id]
+  vpc_security_group_ids = [aws_security_group.security_group.id]
   availability_zone      = "us-east-1d"
   user_data              = file("./user_data.sh")
-  count = 4
+  count                  = 4
   tags = {
     Name = "T2"
   }
@@ -86,7 +86,7 @@ data "aws_subnets" "all" {
 
 resource "aws_alb" "load_balancer" {
   name            = "load-balancer"
-  security_groups = [aws_security_group.security_gp.id]
+  security_groups = [aws_security_group.security_group.id]
   subnets         = data.aws_subnets.all.ids
 }
 
@@ -159,7 +159,7 @@ resource "aws_alb_target_group_attachment" "T2_attachments" {
   port             = 80
 }
 
-output "load_balancer_url"{
+output "load_balancer_url" {
   description = "The infrastructure load balancer url"
-  value = aws_alb.load_balancer.*.dns_name[0]
+  value       = aws_alb.load_balancer.*.dns_name[0]
 }

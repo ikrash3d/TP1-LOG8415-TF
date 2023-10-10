@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import os
 import boto3
-import matplotlib.pyplot as plt
+from matplotlib import pyplot
 from datetime import timedelta, datetime
 
 AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY')
@@ -119,30 +119,27 @@ def get_clusters_metrics(cloudwatch, elbv2_info, metric_name, stat):
 
 
 def build_clusters(cloudwatch, elbv2_info, cluster_m4, cluster_t2):
-    figure, axe = plt.subplots()
 
-    plt.bar(['M4', 'T2'], [sum(get_metric(cloudwatch, elbv2_info, cluster_m4, 'RequestCount', 'Sum', True)), sum(
+    pyplot.bar(['M4', 'T2'], [sum(get_metric(cloudwatch, elbv2_info, cluster_m4, 'RequestCount', 'Sum', True)), sum(
         get_metric(cloudwatch, elbv2_info, cluster_t2, 'RequestCount', 'Sum', True))], color=['blue', 'red'])
 
-    plt.title('Number of Requests per Cluster')
-    plt.savefig('metrics/clusters_requests.png', bbox_inches='tight')
+    pyplot.title('Number of Requests per Cluster')
+    pyplot.savefig('metrics/clusters_requests.png', bbox_inches='tight')
 
     m4_response_time = get_metric(cloudwatch, elbv2_info, cluster_m4,
                                   'TargetResponseTime', 'Average', True)
     t2_response_time = get_metric(cloudwatch, elbv2_info, cluster_t2,
                                   'TargetResponseTime', 'Average', True)
 
-    figure, axe = plt.subplots()
-
     average_m4_time = sum(m4_response_time) / \
         len(m4_response_time) if len(m4_response_time) > 0 else 0
     average_t2_time = sum(t2_response_time) / \
         len(t2_response_time) if len(t2_response_time) > 0 else 0
 
-    plt.bar(['M4', 'T2'], [average_m4_time, average_t2_time],
-            color=['blue', 'red'])
-    plt.title('Average Response Time per Cluster')
-    plt.savefig('metrics/clusters_average_response_time.png')
+    pyplot.bar(['M4', 'T2'], [average_m4_time, average_t2_time],
+               color=['blue', 'red'])
+    pyplot.title('Average Response Time per Cluster')
+    pyplot.savefig('metrics/clusters_average_response_time.png')
 
 
 def fetch_data(cloudwatch_client, elb_name, metric_name, stat, cluster=None):
@@ -183,13 +180,13 @@ def build_table(cloudwatch_client, elb_name, cluster_m4, cluster_t2):
 
 
 def plot_table_data(data):
-    fig, ax = plt.subplots()
+    ax = pyplot.subplots()
     table = ax.table(cellText=data, loc='center')
     table.set_fontsize(12)
     ax.text(0.5, 0.65, 'Load Balancer Metrics', size=10, ha='center',
             transform=ax.transAxes)
     ax.axis('off')
-    plt.savefig('metrics/load_balancer_metrics.png', bbox_inches='tight')
+    pyplot.savefig('metrics/load_balancer_metrics.png', bbox_inches='tight')
 
 
 def main():
