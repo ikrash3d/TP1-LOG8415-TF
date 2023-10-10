@@ -1,30 +1,32 @@
+import os
 import boto3
 import matplotlib.pyplot as plt
 from datetime import timedelta, datetime
 
-AWS_ACCESS_KEY = "ASIA4LCUTONQYPI7UF6C"
-AWS_SECRET_KEY = "m72nVzWQgrQWkT8Ubr9sqOIf5awl7KBIWPiiz2ao"
-AWS_SESSION_TOKEN = "FwoGZXIvYXdzEIT//////////wEaDOJc6DODptvtomTycCLKAfErgzxJUIA9bOPd5jsoTpBv0VTArjHqESkP/SxcDSfG9DZPeE5LPx8+tkW5q4AZHS7p6qfakLnhExAdo3dX1A9wUw4K7GH5/WR7m8NHU6GFYYTqKbTRrEJRN75061cNjRMZreBVdiW5b3N3vaHa5PpB74I3WQ4yPBB6VK4/Hkflixb8oGcgRo9mS1MgvIje7acKytVMqoltNEb12xVOI6xi3i9auECzNvO2CX60t/5m5A7QwIx2zWuzd7v+MkKwixyc2fxYyJ3lTyso3rCBqQYyLX6Sn+INeihIyiYWS2F65eB3/fLoEA7nhLEexGPQrPA5vsYuRJLtjNxz/M29Gg=="
+AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_SESSION_TOKEN = os.environ.get('AWS_SESSION_TOKEN')
+
 
 def initialize_clients():
-    lb_client = boto3.client('elbv2', region_name="us-east-1", aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY, aws_session_token=AWS_SESSION_TOKEN)
-    cloudwatch_client = boto3.client('cloudwatch', region_name="us-east-1", aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY, aws_session_token=AWS_SESSION_TOKEN)
-    return lb_client, cloudwatch_client
+    elbv2_client = boto3.client('elbv2', region_name="us-east-1", aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_ACCESS_KEY, aws_session_token=AWS_SESSION_TOKEN)
+    cloudwatch = boto3.client('cloudwatch', region_name="us-east-1", aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_ACCESS_KEY, aws_session_token=AWS_SESSION_TOKEN)
+    return elbv2_client, cloudwatch
 
-def get_elb_info(lb_client):
-    response_lb = lb_client.describe_load_balancers()
-    raw_arn = response_lb['LoadBalancers'][0]['LoadBalancerArn'].split(':')[-1].split('/')
-    elb_name = raw_arn[1] + '/'  + raw_arn[2] + '/' + raw_arn[3]
-    return elb_name
+def get_elb_info(elbv2_client):
+    load_balancers = elbv2_client.describe_load_balancers()
+    arns = load_balancers['LoadBalancers'][0]['LoadBalancerArn'].split(':')[-1].split('/')
+    elbv2_info = arns[1] + '/'  + arns[2] + '/' + arns[3]
+    return elbv2_info
 
-def get_target_groups(lb_client):
-    response_tg = lb_client.describe_target_groups()
-    target_group_m4 = response_tg['TargetGroups'][0]['TargetGroupArn'].split(':')[-1]
-    target_group_t2 = response_tg['TargetGroups'][1]['TargetGroupArn'].split(':')[-1]
+def get_target_groups(elbv2_client):
+    target_groups = elbv2_client.describe_target_groups()
+    target_group_m4 = target_groups['TargetGroups'][0]['TargetGroupArn'].split(':')[-1]
+    target_group_t2 = target_groups['TargetGroups'][1]['TargetGroupArn'].split(':')[-1]
     return target_group_m4, target_group_t2
 
-def get_metric(cloudwatch_client, elb_name, tg,metric_name,stat,get_value) :
-    response = cloudwatch_client.get_metric_data(
+def get_metric(cloudwatch, elbv2_info, tg,metric_name,stat,get_value) :
+    response = cloudwatch.get_metric_data(
             MetricDataQueries=[
                 {
                     'Id': 'myrequest',
@@ -39,11 +41,11 @@ def get_metric(cloudwatch_client, elb_name, tg,metric_name,stat,get_value) :
                                 },
                                 {                        
                                     'Name': 'LoadBalancer',
-                                    'Value': elb_name
+                                    'Value': elbv2_info
                                 },
                             ]
                         },
-                        'Period': 300, #5 min period
+                        'Period': 300,
                         'Stat': stat,
                     }
                 },
@@ -57,8 +59,8 @@ def get_metric(cloudwatch_client, elb_name, tg,metric_name,stat,get_value) :
     else :
         return response
 
-def get_lb_metrics(cloudwatch_client, elb_name, metric_name,stat) :
-    response = cloudwatch_client.get_metric_data(
+def get_lb_metrics(cloudwatch, elbv2_info, metric_name, stat) :
+    response = cloudwatch.get_metric_data(
             MetricDataQueries=[
                 {
                     'Id': 'myrequest',
@@ -69,11 +71,11 @@ def get_lb_metrics(cloudwatch_client, elb_name, metric_name,stat) :
                             'Dimensions': [
                                 {                        
                                     'Name': 'LoadBalancer',
-                                    'Value': elb_name
+                                    'Value': elbv2_info
                                 },
                             ]
                         },
-                        'Period': 300, #5 min period
+                        'Period': 300,
                         'Stat': stat,
                     }
                 },
@@ -83,18 +85,18 @@ def get_lb_metrics(cloudwatch_client, elb_name, metric_name,stat) :
         )
     return response['MetricDataResults'][0]['Values']
 
-def target_group_plots(cloudwatch_client, elb_name, target_group_m4, target_group_t2):
+def build_target_groups(cloudwatch, elbv2_info, target_group_m4, target_group_t2):
     fig, ax = plt.subplots()
     x = [
-        sum(get_metric(cloudwatch_client, elb_name, target_group_m4, 'RequestCount', 'Sum', True)),
-        sum(get_metric(cloudwatch_client, elb_name, target_group_t2, 'RequestCount', 'Sum', True))
+        sum(get_metric(cloudwatch, elbv2_info, target_group_m4, 'RequestCount', 'Sum', True)),
+        sum(get_metric(cloudwatch, elbv2_info, target_group_t2, 'RequestCount', 'Sum', True))
     ]
     plt.bar(['m4','t2'],x)
     plt.title('Number of requests per target group')
     plt.savefig('metrics/target-group-reqs.png', bbox_inches='tight')
 
-    m4 = get_metric(cloudwatch_client, elb_name, target_group_m4,'TargetResponseTime','Average',True)
-    t2 = get_metric(cloudwatch_client, elb_name, target_group_t2,'TargetResponseTime','Average',True)
+    m4 = get_metric(cloudwatch, elbv2_info, target_group_m4,'TargetResponseTime','Average',True)
+    t2 = get_metric(cloudwatch, elbv2_info, target_group_t2,'TargetResponseTime','Average',True)
     fig, ax = plt.subplots()
 
     avg_m4 = sum(m4)/len(m4) if len(m4) > 0 else 0
@@ -107,16 +109,16 @@ def target_group_plots(cloudwatch_client, elb_name, target_group_m4, target_grou
     plt.savefig('metrics/target-group-avg-res.png')
 
 
-def plot_elb_table(cloudwatch_client, elb_name, target_group_m4, target_group_t2):
-    act = get_lb_metrics(cloudwatch_client, elb_name, 'ActiveConnectionCount','Sum')
+def build_table(cloudwatch, elbv2_info, target_group_m4, target_group_t2):
+    act = get_lb_metrics(cloudwatch, elbv2_info, 'ActiveConnectionCount','Sum')
     if act:
         avg_act = sum(act)/len(act)
     else:
         avg_act = 0    
-    pros_bytes = sum(get_lb_metrics(cloudwatch_client, elb_name, 'ProcessedBytes','Sum'))
-    rq_count = sum(get_lb_metrics(cloudwatch_client, elb_name, 'RequestCount','Sum'))
-    hs_m4 = max(get_metric(cloudwatch_client, elb_name, target_group_m4, 'HealthyHostCount','Maximum', True))
-    hs_t2 = max(get_metric(cloudwatch_client, elb_name, target_group_t2,'HealthyHostCount','Maximum', True))
+    pros_bytes = sum(get_lb_metrics(cloudwatch, elbv2_info, 'ProcessedBytes','Sum'))
+    rq_count = sum(get_lb_metrics(cloudwatch, elbv2_info, 'RequestCount','Sum'))
+    hs_m4 = max(get_metric(cloudwatch, elbv2_info, target_group_m4, 'HealthyHostCount','Maximum', True))
+    hs_t2 = max(get_metric(cloudwatch, elbv2_info, target_group_t2,'HealthyHostCount','Maximum', True))
 
     table_data=[
     ["Average active connection count", avg_act],
@@ -135,15 +137,12 @@ def plot_elb_table(cloudwatch_client, elb_name, target_group_m4, target_group_t2
     plt.savefig('metrics/elb-plots.png', bbox_inches='tight')
 
 def main():
-    lb_client, cloudwatch_client = initialize_clients()
-    elb_name = get_elb_info(lb_client)
-    target_group_m4, target_group_t2 = get_target_groups(lb_client)
+    elbv2_client, cloudwatch = initialize_clients()
+    elbv2_info = get_elb_info(elbv2_client)
+    target_group_m4, target_group_t2 = get_target_groups(elbv2_client)
 
-    plot_elb_table(cloudwatch_client, elb_name, target_group_m4, target_group_t2)
-    target_group_plots(cloudwatch_client, elb_name, target_group_m4, target_group_t2)
-
-
-
+    build_table(cloudwatch, elbv2_info, target_group_m4, target_group_t2)
+    build_target_groups(cloudwatch, elbv2_info, target_group_m4, target_group_t2)
 
 
 if __name__ == '__main__':
