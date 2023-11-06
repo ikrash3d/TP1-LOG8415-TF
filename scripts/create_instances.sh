@@ -8,13 +8,13 @@ echo -e "Creating instances...\n"
 cd ../infrastructure
 
 # Initilize Terraform
-terraform init
+terraform.exe init
 
 # Applies the the main.tf
-terraform apply -auto-approve -var="aws_access_key_id=$AWS_ACCESS_KEY" -var="aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" -var="aws_session_token=$AWS_SESSION_TOKEN"
+terraform.exe apply -auto-approve -var="aws_access_key_id=$AWS_ACCESS_KEY" -var="aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" -var="aws_session_token=$AWS_SESSION_TOKEN"
 
 # Retrieve the load balancer URL
-load_balancer_url=$(terraform output --raw load_balancer_url)
+load_balancer_url=$(terraform.exe output --raw load_balancer_url)
 
 # Export the load_balancer_url variable
 echo "export load_balancer_url=$load_balancer_url" >> ../scripts/env_vars.sh
