@@ -26,17 +26,21 @@ echo -e "-----------\n"
 
 ## Deploying the infrastructure
 echo -e "Deploying the infrastructure...\n"
+chmod u+r+x ./create_instances.sh
 ./create_instances.sh
 
 ## Sending the requests to the load balancer
+chmod u+r+x ./send_requests.sh
 ./send_requests.sh
 
 # Running the benchmark
 echo -e "Running the benchmarks...\n"
+chmod u+r+x ./run_benchmark.sh
 ./run_benchmark.sh
 
 # Terminating the infrastructure
 echo -e "Terminating infrastructure...\n"
+chmod u+r+x ./kill_instances.sh
 ./kill_instances.sh
 
 # Clears the content of env_vars.sh
