@@ -38,12 +38,12 @@ echo -e "Running the benchmarks...\n"
 chmod u+r+x ./run_benchmark.sh
 ./run_benchmark.sh
 
-# Terminating the infrastructure
-echo -e "Terminating infrastructure...\n"
-chmod u+r+x ./kill_instances.sh
-./kill_instances.sh
+# # Terminating the infrastructure
+# echo -e "Terminating infrastructure...\n"
+# chmod u+r+x ./kill_instances.sh
+# ./kill_instances.sh
 
-# Clears the content of env_vars.sh
-> env_vars.sh
+# # Clears the content of env_vars.sh
+# > env_vars.sh
 
-echo -e "You successfully ended Assignment 1 :)"
+# echo -e "You successfully ended Assignment 1 :)"
